@@ -1,6 +1,6 @@
 # merge_sbom
 
-[![GitHub license](https://img.shields.io/github/license/ReFirmLabs/binwalk.svg)](https://github.com/ReFirmLabs/binwalk/blob/master/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/ReFirmLabs/binwalk.svg)](LICENSE)
 
 # SBOM Merge Script
 
