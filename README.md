@@ -1,5 +1,7 @@
 # merge_sbom
-=======
+
+[![GitHub license](https://img.shields.io/github/license/ReFirmLabs/binwalk.svg)](https://github.com/ReFirmLabs/binwalk/blob/master/LICENSE)
+
 # SBOM Merge Script
 
 ## Description
@@ -65,5 +67,3 @@ Contributions to this script are welcome. Please fork the repository and submit 
 
 ---
 
-Replace `[URL_to_this_repository]` and `[repository_name]` with the actual URL and name of your repository. Specify the license under which you're releasing the script, if applicable.
->>>>>>> c828447 (Initial commit with source code)
