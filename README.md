@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # merge_sbom
 =======
 # SBOM Merge Script
