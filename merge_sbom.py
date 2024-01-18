@@ -16,6 +16,7 @@ def unzip_sbom(zip_file, extract_to):
     try:
         with zipfile.ZipFile(zip_file, 'r') as zip_ref:
             zip_ref.extractall(extract_to)
+        logging.info(f"Unzipped {zip_file} to {extract_to}")
         return True
     except zipfile.BadZipFile:
         logging.error(f"Invalid zip file: {zip_file}")
@@ -25,18 +26,53 @@ def unzip_sbom(zip_file, extract_to):
         return False
 
 def run_merge(files_to_merge, output_file):
-    # ... [previous run_merge function] ...
+    """
+    Executes the CycloneDX merge command for a list of files.
+    """
+    try:
+        subprocess.run(['cyclonedx', 'merge', '--input-files'] + files_to_merge + ['--output-file', output_file], check=True, stdout=subprocess.DEVNULL)
+        logging.info(f"Merged files into {output_file}")
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Error in merging files into {output_file}: {e}")
+        return False
+    return True
 
 def split_into_chunks(lst, n):
-    # ... [previous split_into_chunks function] ...
+    """
+    Splits a list into chunks of size n.
+    """
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
 
 def main(zip_path, chunk_size, num_threads):
-    # Unzip the SBOM zip file
+    """
+    Main function to merge SBOM files from a zip file.
+    """
     extract_to = os.path.splitext(zip_path)[0]
     if not unzip_sbom(zip_path, extract_to):
         return False
 
-    # ... [rest of the main function with dir_path replaced by extract_to] ...
+    files = [os.path.join(extract_to, f) for f in os.listdir(extract_to) if f.endswith('.xml')]
+    file_chunks = list(split_into_chunks(files, chunk_size))
+    intermediate_files = [f"intermediate_{i}.xml" for i in range(len(file_chunks))]
+
+    success = True
+    with ThreadPoolExecutor(max_workers=num_threads) as executor:
+        future_to_chunk = {executor.submit(run_merge, chunk, os.path.join(extract_to, intermediate)): chunk for chunk, intermediate in zip(file_chunks, intermediate_files)}
+
+        with tqdm(total=len(future_to_chunk), desc="Merging Files", unit="chunk") as progress:
+            for future in as_completed(future_to_chunk):
+                if not future.result():
+                    success = False
+                progress.update(1)
+
+    if success:
+        final_output = os.path.join(extract_to, "final_merged.xml")
+        existing_intermediates = [os.path.join(extract_to, f) for f in intermediate_files if os.path.exists(os.path.join(extract_to, f))]
+        if not run_merge(existing_intermediates, final_output):
+            success = False
+
+    return success
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Merge SBOM XML files from a zip file using CycloneDX.")
@@ -46,10 +82,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    if args.zipfile:
-        zip_path = args.zipfile
-    else:
-        zip_path = input("Enter the path to the SBOM zip file: ")
+    zip_path = args.zipfile or input("Enter the path to the SBOM zip file: ")
 
     if not os.path.isfile(zip_path):
         logging.error(f"The file {zip_path} does not exist.")
