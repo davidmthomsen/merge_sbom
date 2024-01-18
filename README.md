@@ -16,8 +16,8 @@ This script is designed to merge a large number of SBOM (Software Bill of Materi
 1. Clone this repository or download the script to your local machine.
 
     ```bash
-    git clone [URL_to_this_repository]
-    cd [repository_name]
+    git clone https://github.com/davidmthomsen/merge_sbom.git
+    cd merge_sbom
     ```
 
 2. Install the required Python dependencies:
