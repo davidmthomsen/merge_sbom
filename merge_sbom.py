@@ -53,8 +53,11 @@ def main(dir_path, chunk_size, num_threads):
 
     if success:
         final_output = os.path.join(dir_path, "final_merged.xml")
-        all_intermediates = [os.path.join(dir_path, f) for f in intermediate_files]
-        if not run_merge(all_intermediates, final_output):
+        
+        # Filter out non-existent intermediate files before final merge
+        existing_intermediates = [os.path.join(dir_path, f) for f in intermediate_files if os.path.exists(os.path.join(dir_path, f))]
+        
+        if not run_merge(existing_intermediates, final_output):
             success = False
 
     return success
