@@ -61,9 +61,5 @@ You can run the script with command-line arguments or interactively:
 
 Contributions to this script are welcome. Please fork the repository and submit a pull request with your changes.
 
-## License
-
-[Specify the license here, if applicable]
-
 ---
 
