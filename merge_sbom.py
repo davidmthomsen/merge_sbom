@@ -2,6 +2,7 @@ import argparse
 import os
 import subprocess
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import TimeoutError
 from tqdm import tqdm
 import logging
 import zipfile
@@ -68,9 +69,13 @@ def main(zip_path, chunk_size, num_threads):
 
         # Progress bar to monitor the process
         with tqdm(total=len(future_to_chunk), desc="Merging Files", unit="chunk") as progress:
-            for future in as_completed(future_to_chunk):
+            for future in as_completed(future_to_chunk, timeout=120):
+                try:
                 # Checks for errors in completed futures
-                if not future.result():
+                    if not future.result():
+                        success = False
+                except TimeoutError:
+                    logging.error("Processing timed out for a chunk")
                     success = False
                 progress.update(1)
 
