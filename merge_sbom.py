@@ -8,7 +8,7 @@ import logging
 import zipfile
 
 # Set up basic logging
-logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.ERROR)
 
 def unzip_sbom(zip_file, extract_to):
     """
@@ -32,7 +32,7 @@ def run_merge(files_to_merge, output_file):
     """
     try:
         subprocess.run(['cyclonedx', 'merge', '--input-files'] + files_to_merge + ['--output-file', output_file], check=True, stdout=subprocess.DEVNULL)
-        logging.info(f"Merged files into {output_file}")
+        # logging.info(f"Merged files into {output_file}")
     except subprocess.CalledProcessError as e:
         logging.error(f"Error in merging files into {output_file}: {e}")
         return False
